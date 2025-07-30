@@ -31,3 +31,6 @@ class Review(models.Model):
     content = models.TextField(max_length=100, null=False)
     rating = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.content[0:50]
