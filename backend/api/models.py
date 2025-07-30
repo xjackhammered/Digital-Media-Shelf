@@ -1,0 +1,33 @@
+from django.db import models
+
+# Create your models here.
+class MediaItem(models.Model):
+    MEDIA_TYPES = [('movie', 'Movie'),
+                   ('game', 'Game'),
+                   ('series', 'Series'),
+                   ('book', 'Book')]
+    name = models.CharField(max_length=100)
+    type = models.CharField(max_length=10, choices=MEDIA_TYPES)
+    genres = models.ManyToManyField('Genre', null=False)
+    status = models.CharField(choices=[
+        ('completed', 'Completed'),
+        ('watching', 'Watching'),
+        ('wishlisted', 'Wishlisted'),
+        ('dropped', 'Dropped')
+    ], max_length=15)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+class Genre(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class Review(models.Model):
+    media = models.ForeignKey(MediaItem, on_delete=models.CASCADE, related_name="reviews")
+    content = models.TextField(max_length=100, null=False)
+    rating = models.PositiveIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
