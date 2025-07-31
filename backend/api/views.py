@@ -70,3 +70,35 @@ def deleteGenre(request, id):
     genre.delete()
     return Response("Genre has been successfully deleted!")
 
+@api_view(['GET'])
+def allReviews(request):
+    reviews = Review.objects.all()
+    serializer = ReviewSerializer(reviews, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def addReview(request):
+    serializer = ReviewSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+    return Response(serializer.data)
+
+@api_view(['POST', 'PATCH'])
+def updateReview(request, id):
+    review = Review.objects.get(id=id)
+
+    partial = request.method == "PATCH"
+    serializer = ReviewSerializer(instance=review, data=request.data, partial=partial)
+
+    if serializer.is_valid():
+        serializer.save()
+    
+    return Response(serializer.data)
+
+@api_view(['DELETE'])
+def deleteReview(request, id):
+    review = Review.objects.get(id=id)
+    review.delete()
+
+    return Response("Review deleted successfully!")
