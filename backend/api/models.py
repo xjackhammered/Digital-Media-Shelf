@@ -8,7 +8,7 @@ class MediaItem(models.Model):
                    ('book', 'Book')]
     name = models.CharField(max_length=100)
     type = models.CharField(max_length=10, choices=MEDIA_TYPES)
-    genres = models.ManyToManyField('Genre', null=False)
+    genres = models.ManyToManyField('Genre', blank=False)
     status = models.CharField(choices=[
         ('completed', 'Completed'),
         ('watching', 'Watching'),
