@@ -36,5 +36,5 @@ class MediaSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MediaItem
-        fields = ['name','type','genres','status', 'created_at', 'genre_ids', 'reviews' ]
+        fields = ['id','name','type','genres','status', 'created_at', 'genre_ids', 'reviews' ]
 
