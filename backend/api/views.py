@@ -4,9 +4,10 @@ from rest_framework.decorators import api_view, permission_classes # pyright: ig
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import MediaSerializer, GenreSerializer, ReviewSerializer, RegisterSerializer
 from .models import MediaItem, Genre, Review
+
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 # Create your views here.
-
-
 
 api_view(['POST'])
 @permission_classes([AllowAny])
@@ -16,6 +17,17 @@ def register(request):
         serializer.save()
         return Response({"message":"User Registered!"}, status=201)
     return Response(serializer.errors, status=400)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def logout(request):
+    try:
+        refresh_token = request.data["refresh"]
+        token = RefreshToken(refresh_token)
+        token.blacklist()
+        return Response({"message":"Logged out"})
+    except Exception:
+        return Response({"error":"Invalid Token"}, status=400)
 
 
 @api_view(['GET'])
