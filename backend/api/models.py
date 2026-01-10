@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 class MediaItem(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="media", null=True, blank=True)
     MEDIA_TYPES = [('movie', 'Movie'),
                    ('game', 'Game'),
                    ('series', 'Series'),
@@ -27,6 +29,7 @@ class Genre(models.Model):
         return self.name
 
 class Review(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name="review", null=True, blank=True)
     media = models.ForeignKey(MediaItem, on_delete=models.CASCADE, related_name="reviews")
     content = models.TextField(max_length=100, null=False)
     rating = models.PositiveIntegerField()
