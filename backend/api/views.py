@@ -9,7 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 # Create your views here.
 
-api_view(['POST'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
@@ -37,31 +37,40 @@ def medialist(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def addMedia(request):
     serializer = MediaSerializer(data=request.data)
 
     if serializer.is_valid():
-        media = serializer.save()
+        media = serializer.save(owner=request.user)
         return Response(MediaSerializer(media).data, status=201)
     return Response(serializer.errors, status=400)
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteMedia(request, id):
-    media = MediaItem.objects.get(id=id)
+    try:
+        media = MediaItem.objects.get(id=id, owner=request.user)
+    except MediaItem.DoesNotExist:
+        return Response({"error":"Not found or not allowed"}, status=404)
+    
     media.delete()
-    return Response("Media deleted successfully!")
+    return Response({"message": "Media deleted successfully!"})
 
-@api_view(['POST', 'PATCH'])
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
 def updateMedia(request, id):
-    media = MediaItem.objects.get(id=id)
+    try:
+        media = MediaItem.objects.get(id=id, owner=request.user)
+    except MediaItem.DoesNotExist:
+        return Response({"error": "Not found or not allowed"}, status=404)
 
-    partial = request.method == 'PATCH'
-    serializer = MediaSerializer(instance=media, data=request.data, partial=partial)
-
+    serializer = MediaSerializer(media, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+        return Response(serializer.data)
 
-    return Response(serializer.data)
+    return Response(serializer.errors, status=400)
 
 @api_view(['GET'])
 def allGenres(request):
@@ -103,29 +112,34 @@ def allReviews(request):
     return Response(serializer.data)
 
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def addReview(request):
+    
     serializer = ReviewSerializer(data=request.data)
 
     if serializer.is_valid():
-        review = serializer.save()
+        review = serializer.save(owner=request.user)
         return Response(ReviewSerializer(review).data, status=201)
     return Response(serializer.errors, status=400)
 
-@api_view(['POST', 'PATCH'])
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
 def updateReview(request, id):
-    review = Review.objects.get(id=id)
-
-    partial = request.method == "PATCH"
-    serializer = ReviewSerializer(instance=review, data=request.data, partial=partial)
-
+    try:
+        review = Review.objects.get(id=id, owner=request.user)
+    except Review.DoesNotExist:
+        return Response({"error":"Not found or not allowed"},status=404)
+    
+    serializer = ReviewSerializer(review, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+        return Response(serializer.data)    
     
-    return Response(serializer.data)
+    return Response(serializer.errors, status=400)
 
 @api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
 def deleteReview(request, id):
-    review = Review.objects.get(id=id)
+    review = Review.objects.get(id=id, owner=request.user)
     review.delete()
-
     return Response("Review deleted successfully!")
