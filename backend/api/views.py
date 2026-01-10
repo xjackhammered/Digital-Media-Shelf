@@ -1,9 +1,22 @@
 from django.shortcuts import render
 from rest_framework.response import Response # pyright: ignore[reportMissingImports]
-from rest_framework.decorators import api_view # pyright: ignore[reportMissingImports]
-from .serializers import MediaSerializer, GenreSerializer, ReviewSerializer
+from rest_framework.decorators import api_view, permission_classes # pyright: ignore[reportMissingImports]
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .serializers import MediaSerializer, GenreSerializer, ReviewSerializer, RegisterSerializer
 from .models import MediaItem, Genre, Review
 # Create your views here.
+
+
+
+api_view(['POST'])
+@permission_classes([AllowAny])
+def register(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message":"User Registered!"}, status=201)
+    return Response(serializer.errors, status=400)
+
 
 @api_view(['GET'])
 def medialist(request):
