@@ -16,9 +16,9 @@ def addMedia(request):
     serializer = MediaSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save()
-    
-    return Response(serializer.data)
+        media = serializer.save()
+        return Response(MediaSerializer(media).data, status=201)
+    return Response(serializer.errors, status=400)
 
 @api_view(['DELETE'])
 def deleteMedia(request, id):
@@ -49,9 +49,10 @@ def addGenre(request):
     serializer = GenreSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save()
+        genre = serializer.save()
+        return Response(GenreSerializer(genre).data, status=201)
     
-    return Response(serializer.data)
+    return Response(serializer.errors, status=400)
 
 @api_view(['POST', 'PATCH'])
 def updateGenre(request, id):
@@ -81,8 +82,9 @@ def addReview(request):
     serializer = ReviewSerializer(data=request.data)
 
     if serializer.is_valid():
-        serializer.save()
-    return Response(serializer.data)
+        review = serializer.save()
+        return Response(ReviewSerializer(review).data, status=201)
+    return Response(serializer.errors, status=400)
 
 @api_view(['POST', 'PATCH'])
 def updateReview(request, id):
