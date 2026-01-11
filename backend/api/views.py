@@ -70,7 +70,7 @@ def updateMedia(request, id):
         serializer.save()
         return Response(serializer.data)
 
-    return Response(serializer.errors, status=400)
+    return Response(serializer.data, status=400)
 
 @api_view(['GET'])
 def allGenres(request):
